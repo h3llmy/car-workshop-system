@@ -16,6 +16,8 @@ class CarController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Car::class);
+
         $user = Auth::user();
         $cars = Car::where('user_id', $user->id)->latest()->get();
         return response()->json([
@@ -44,6 +46,7 @@ class CarController extends Controller
      */
     public function show(Car $car)
     {
+        $this->authorize('view', $car);
         return response()->json([
             'message' => 'get car success',
             'data' => $car
@@ -70,6 +73,8 @@ class CarController extends Controller
      */
     public function destroy(Car $car)
     {
+        $this->authorize('delete', $car);
+        
         $car->delete();
 
         return response()->json([
