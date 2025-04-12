@@ -49,3 +49,6 @@ https://dbdiagram.io/d/car-workshop-system-67f95c5a4f7afba184493117
 ## State Machine Diagram
 
 ![State Machine Diagram](docs/images/state-machine-diagram.jpg)
+
+## Postman Collection
+https://www.postman.com/red-space-400771/workspace/car-workshop-system/collection/23469470-57d8de5e-ba9d-4669-b752-5b75e7db80a6?action=share&creator=23469470&active-environment=23469470-29664b89-5820-4cc2-b06a-6282dfe37d62
