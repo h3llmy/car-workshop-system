@@ -51,7 +51,7 @@ class AuthController extends Controller
 
     public function user()
     {
-        $user = auth()->user()->with('role')->first();
+        $user = auth()->user()->load('roles');
         return response()->json([
             'message' => 'get user success',
             'data' => $user

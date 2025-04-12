@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
@@ -16,9 +16,15 @@ class RoleSeeder extends Seeder
         Role::insert([
             [
                 'name' => 'super admin',
+                'guard_name' => 'web'            
             ],
             [
-                'name' => 'customer',
+                'name' => 'car owner',
+                'guard_name' => 'web'            
+            ],
+                        [
+                'name' => 'mechanic',
+                'guard_name' => 'web'           
             ]
         ]);
     }
