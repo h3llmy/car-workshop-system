@@ -9,6 +9,8 @@ use App\Http\Requests\RepairProposal\UpdateRepairProposalRequest;
 use App\Http\Requests\RepairProposal\AcceptRepairProposal;
 use App\Models\Service;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RepairProposalDoneMail;
 
 class RepairProposalController extends Controller
 {
@@ -19,7 +21,7 @@ class RepairProposalController extends Controller
     {
         $this->authorize('viewAny', RepairProposal::class);
 
-        $repairProposal = RepairProposal::paginate(10);
+        $repairProposal = RepairProposal::with('car')->paginate(10);
         return response()->json([
             'message' => 'get all repair proposals success',
             'data' => $repairProposal
@@ -96,23 +98,35 @@ class RepairProposalController extends Controller
                 'is_approved' => true,
             ]);
 
-            $servicesData = collect($request->services)
-                ->map(function ($service) use ($repairProposal) {
-                    return [
-                        'name' => $service['name'],
-                        'price' => $service['price'],
-                        'description' => $service['description'],
-                        'repair_proposal_id' => $repairProposal->id,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                })->toArray();
+            $services = collect($request->services);
+
+            $totalPrice = $services->sum('price');
+            
+            $servicesData = $services->map(function ($service) use ($repairProposal) {
+                return [
+                    'name' => $service['name'],
+                    'price' => $service['price'],
+                    'description' => $service['description'],
+                    'repair_proposal_id' => $repairProposal->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            })->toArray();
+            
 
             Service::insert($servicesData);
 
             // TODO
+            $repairProposal->load('car.user');
+
             if ($this->checkAllServiceDone($repairProposal)) {
-                # code...
+                Mail::to($repairProposal->car->user->email)
+                    ->send(new RepairProposalDoneMail([
+                        'customer_name' => $repairProposal->car->user->name,
+                        'proposal_id' => $repairProposal->id,
+                        'total_cost' => $totalPrice,
+                        'completion_date' => $repairProposal->updated_at,
+                    ]));
             }
 
             DB::commit();
