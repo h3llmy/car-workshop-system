@@ -1,22 +1,18 @@
 <?php
 
-namespace App\Http\Requests\Car;
+namespace App\Http\Requests\RepairProposal;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\Car;
+use App\Models\RepairProposal;
 
-class UpdateCarRequest extends FormRequest
+class AcceptRepairProposal extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        // Retrieve the car from the route parameters
-        $car = $this->route('car');
-
-        // Ensure the car exists and the user is logged in and owns the car
-        return $this->user()->can('update', $car);
+        return $this->user()->can('accept', RepairProposal::class);
     }
 
     /**
@@ -27,7 +23,7 @@ class UpdateCarRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required'
+            //
         ];
     }
 }
