@@ -55,15 +55,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Car::class);
     }
 
-    protected static function booted()
-    {
-        static::created(function ($user) {
-            if (!$user->role_id) {
-                $user->assignRole('car owner');
-            }
-        });
-    }
-
     public function getJWTIdentifier()
     {
         return $this->getKey();

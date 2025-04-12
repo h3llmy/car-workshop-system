@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Policies\CarPolicy;
+use App\Policies\RepairProposalPolicy;
 use App\Models\Car;
+use App\Models\RepairProposal;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -17,6 +19,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         // Map models to their policies here
         Car::class => CarPolicy::class,
+        RepairProposal::class => RepairProposalPolicy::class,
     ];
 
     /**

@@ -16,7 +16,7 @@ class UpdateCarRequest extends FormRequest
         $car = $this->route('car');
 
         // Ensure the car exists and the user is logged in and owns the car
-        return $car && auth()->check() && $car->user_id === auth()->id();
+        return $this->user()->can('update', $car);
     }
 
     /**
