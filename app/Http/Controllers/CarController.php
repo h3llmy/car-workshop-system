@@ -19,7 +19,7 @@ class CarController extends Controller
         $this->authorize('viewAny', Car::class);
 
         $user = Auth::user();
-        $cars = Car::where('user_id', $user->id)->latest()->get();
+        $cars = Car::where('user_id', $user->id)->latest()->paginate(10);
         return response()->json([
             'message' => 'get all cars success',
             'data' => $cars

@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -18,9 +19,19 @@ class UserSeeder extends Seeder
         $user = User::firstOrCreate([
             'name' => 'admin',
             'email' => 'admin@localhost',
-            'password' => '12345678',
+            'password' => Hash::make('12345678'),
         ]);
 
         $user->assignRole($role);
+
+        // Mechanic user
+        $mechanicRole = Role::firstOrCreate(['name' => 'mechanic']);
+        $mechanic = User::firstOrCreate([
+            'email' => 'mechanic@localhost',
+        ], [
+            'name' => 'mechanic',
+            'password' => Hash::make('12345678'),
+        ]);
+        $mechanic->assignRole($mechanicRole);
     }
 }

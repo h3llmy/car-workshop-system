@@ -23,7 +23,10 @@ class AcceptRepairProposal extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'services' => 'required|array',
+            'services.*.name' => 'required_with:services|string|max:255',
+            'services.*.price' => 'required_with:services|numeric|min:0',
+            'services.*.description' => 'required_with:services|string',
         ];
     }
 }

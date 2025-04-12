@@ -7,6 +7,8 @@ use App\Models\RepairProposal;
 use App\Http\Requests\RepairProposal\CreateRepairProposalRequest;
 use App\Http\Requests\RepairProposal\UpdateRepairProposalRequest;
 use App\Http\Requests\RepairProposal\AcceptRepairProposal;
+use App\Models\Service;
+use Illuminate\Support\Facades\DB;
 
 class RepairProposalController extends Controller
 {
@@ -17,7 +19,7 @@ class RepairProposalController extends Controller
     {
         $this->authorize('viewAny', RepairProposal::class);
 
-        $repairProposal = RepairProposal::all();
+        $repairProposal = RepairProposal::paginate(10);
         return response()->json([
             'message' => 'get all repair proposals success',
             'data' => $repairProposal
@@ -87,31 +89,46 @@ class RepairProposalController extends Controller
             ], 400);
         }
 
-        $repairProposal->update([
-            'is_approved' => true,
-        ]);
+        DB::beginTransaction();
 
-        return response()->json([
-            'message' => 'accept repair proposal success',
-            'data' => $repairProposal,
-        ]);
-    }
+        try {
+            $repairProposal->update([
+                'is_approved' => true,
+            ]);
 
-    /**
-     * car owner mark proposal as done.
-     */
-    public function done(RepairProposal $repairProposal)
-    {
-        $this->authorize('done', $repairProposal);
+            $servicesData = collect($request->services)
+                ->map(function ($service) use ($repairProposal) {
+                    return [
+                        'name' => $service['name'],
+                        'price' => $service['price'],
+                        'description' => $service['description'],
+                        'repair_proposal_id' => $repairProposal->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                })->toArray();
 
-        $repairProposal->update([
-            'is_done' => true,
-        ]);
+            Service::insert($servicesData);
 
-        return response()->json([
-            'message' => 'accept repair proposal success',
-            'data' => $repairProposal,
-        ]);
+            // TODO
+            if ($this->checkAllServiceDone($repairProposal)) {
+                # code...
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'accept repair proposal success',
+                'data' => $repairProposal->load('services'),
+            ]);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'failed to accept repair proposal',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -126,5 +143,18 @@ class RepairProposalController extends Controller
         return response()->json([
             'message' => 'delete repair proposal success'
         ]);
+    }
+
+    private function checkAllServiceDone(RepairProposal $repairProposal)
+    {
+        $repairProposal->load('services');
+
+        foreach ($repairProposal->services as $service) {
+            if (!$service->is_done) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
