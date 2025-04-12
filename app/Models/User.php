@@ -8,12 +8,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
+use App\Models\Car;
 
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -49,19 +50,16 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-    public function role(): BelongsTo
+    public function cars()
     {
-        return $this->belongsTo(Role::class);
+        return $this->hasMany(Car::class);
     }
 
     protected static function booted()
     {
         static::created(function ($user) {
             if (!$user->role_id) {
-                $role = Role::firstOrCreate([
-                    'name' => 'customer',
-                ]);
-                $user->role_id = $role->id;
+                $user->assignRole('car owner');
             }
         });
     }
