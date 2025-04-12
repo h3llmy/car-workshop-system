@@ -45,3 +45,7 @@ docker compose up -d
 ## Entity Relationship Diagram (ERD)
 
 https://dbdiagram.io/d/car-workshop-system-67f95c5a4f7afba184493117
+
+## State Machine Diagram
+
+![State Machine Diagram](docs/images/state-machine-diagram.jpg)
