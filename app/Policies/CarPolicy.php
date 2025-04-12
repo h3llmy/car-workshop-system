@@ -19,7 +19,7 @@ class CarPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasRole('car owner');
     }
 
     /**
