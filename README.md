@@ -39,3 +39,9 @@ or using docker compose command
 ```sh
 docker compose up -d
 ```
+
+# Documentation
+
+## Entity Relationship Diagram (ERD)
+
+https://dbdiagram.io/d/car-workshop-system-67f95c5a4f7afba184493117
