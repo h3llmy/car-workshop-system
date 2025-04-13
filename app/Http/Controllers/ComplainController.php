@@ -17,9 +17,9 @@ class ComplainController extends Controller
         if ($user->hasRole('car owner')) {
             $complains = Complain::whereHas('repairProposal.car', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
-            })->paginate(10);
+            })->with('repairProposal', 'repairProposal.car')->paginate(10);
         } else {
-            $complains = Complain::paginate(10);
+            $complains = Complain::with('repairProposal', 'repairProposal.car')->paginate(10);
         }
 
         return response()->json([
